@@ -1,8 +1,14 @@
 # Service which retrieves the profile of one facebook user.
 
-## Run the Application
+## Download "vendor" folder
 
 Run this command from the directory in which you download the source code.
+
+    composer install
+    
+## Run the Application
+
+Run this command into the same directory.
 
     php -S [localhost] -t public public/index.php
 
