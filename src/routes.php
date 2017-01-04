@@ -11,9 +11,11 @@ $app->get('/profile/facebook/{id}', function ($request, $response, $args) {
 
 	try {
   		$fbData = $fb->get('/'.$args['id'].'?fields=first_name,last_name','EAAJJpu8mtRMBAPkAxkeGqVCcFNznQa54ffsKYcBRfU2BWqPuLVS3sNimpNCWtDeDcLVFoHToDyRAVMT7CbbZCXR2ceMNTO50e49cvgzmsndry7ZB34yqxaEbsxKeuZCmpEjPv1HZBTGfICfTOkwo7sZA6fSqfzSH4Ggbw4B2CrD4821pQg3ZCQVmI6HMutBl0ZD');
+  		$userData = json_decode($fbData->getBody());
+  		$data = array('id' => $userData->id,'firstName' => $userData->first_name,'lastName' => $userData->last_name);
   		return $response->withStatus(200)
         ->withHeader('Content-Type', 'application/json')
-        ->write($fbData->getBody());
+        ->withJson($data);
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
   		echo 'Graph returned an error: ' . $e->getMessage();
   		exit;
