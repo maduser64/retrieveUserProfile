@@ -1,26 +1,39 @@
 <?php
 // Routes
 
+// route for facebook retrieve profile data
 $app->get('/profile/facebook/{id}', function ($request, $response, $args) {
     
+    // load de graph api
     $fb = new Facebook\Facebook([
-  		'app_id' => '643931279111443',
-  		'app_secret' => '4b27dbed273f80adbcc5072f0688cb18',
-  		'default_graph_version' => 'v2.2',
+  		'app_id' => $this->get('settings')['openGraph']['app_id'],
+  		'app_secret' => $this->get('settings')['openGraph']['app_secret'],
+  		'default_graph_version' => $this->get('settings')['openGraph']['default_graph_version'],
   	]);
 
 	try {
-  		$fbData = $fb->get('/'.$args['id'].'?fields=first_name,last_name','EAAJJpu8mtRMBAPkAxkeGqVCcFNznQa54ffsKYcBRfU2BWqPuLVS3sNimpNCWtDeDcLVFoHToDyRAVMT7CbbZCXR2ceMNTO50e49cvgzmsndry7ZB34yqxaEbsxKeuZCmpEjPv1HZBTGfICfTOkwo7sZA6fSqfzSH4Ggbw4B2CrD4821pQg3ZCQVmI6HMutBl0ZD');
+		// get user data from graph api (first_name & last_name)
+  		$fbData = $fb->get('/'.$args['id'].'?fields='.$this->get('settings')['openGraph']['query_fields'],$this->get('settings')['openGraph']['app_id'].'|'.$this->get('settings')['openGraph']['app_secret']);
+  		// decode de response
   		$userData = json_decode($fbData->getBody());
-  		$data = array('id' => $userData->id,'firstName' => $userData->first_name,'lastName' => $userData->last_name);
+  		// json format to return
+  		$data = array(
+  			'id' => $userData->id,
+  			'firstName' => $userData->first_name,
+  			'lastName' => $userData->last_name
+  		);
   		return $response->withStatus(200)
         ->withHeader('Content-Type', 'application/json')
         ->withJson($data);
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
-  		echo 'Graph returned an error: ' . $e->getMessage();
+		return $response->withStatus(400)
+		->withHeader('Content-Type', 'application/json')
+        ->withJson(array('response' => 'Graph returned an error: ' . $e->getMessage()));
   		exit;
 	} catch(Facebook\Exceptions\FacebookSDKException $e) {
-  		echo 'Facebook SDK returned an error: ' . $e->getMessage();
+  		return $response->withStatus(400)
+		->withHeader('Content-Type', 'application/json')
+        ->withJson(array('response' => 'Facebook SDK returned an error: ' . $e->getMessage()));
   		exit;
 	}
 
