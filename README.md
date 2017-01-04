@@ -1,5 +1,7 @@
 # Service which retrieves the profile of one facebook user.
 
+## Download the entire source code in the repository
+
 ## Download "vendor" folder
 
 Run this command from the directory in which you download the source code.
